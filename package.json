@@ -1,0 +1,25 @@
+{
+  "name": "demi-syntax",
+  "displayName": "Demi-SyntaxHighlighting",
+  "description": "Syntax Highlighting for the Demi Programming language",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.80.0"
+  },
+  "categories": [
+    "Programming Languages"
+  ],
+  "contributes": {
+    "languages": [{
+      "id": "demi",
+      "aliases": ["Demi Programing Language", "demi"],
+      "extensions": [".dem",".demi"],
+      "configuration": "./language-configuration.json"
+    }],
+    "grammars": [{
+      "language": "demi",
+      "scopeName": "source.dem",
+      "path": "./syntaxes/demi.tmLanguage.json"
+    }]
+  }
+}
