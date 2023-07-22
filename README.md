@@ -24,6 +24,9 @@ Initial release of Demi Syntax highlighting
 - Added support for functions
 - Added support for variables
 
+### 0.0.2
+
+- Fixed: 'else' & 'elif' keywords not being highlighted, now they are.
 
 ## For more information
 
