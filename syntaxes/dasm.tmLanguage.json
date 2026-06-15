@@ -1,0 +1,392 @@
+{
+  "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+  "name": "DASM",
+  "scopeName": "source.dasm",
+  "fileTypes": [".asm"],
+  "patterns": [
+    { "include": "#comments" },
+    { "include": "#strings" },
+    { "include": "#section_directives" },
+    { "include": "#test_directives" },
+    { "include": "#macro_directives" },
+    { "include": "#data_directives" },
+    { "include": "#other_directives" },
+    { "include": "#registers" },
+    { "include": "#fpu_instructions" },
+    { "include": "#simd_instructions" },
+    { "include": "#vm_instructions" },
+    { "include": "#native_instructions" },
+    { "include": "#numbers" },
+    { "include": "#labels" },
+    { "include": "#operators" }
+  ],
+  "repository": {
+    "comments": {
+      "patterns": [
+        {
+          "name": "comment.line.semicolon.dasm",
+          "match": ";.*$"
+        },
+        {
+          "name": "comment.line.hash.dasm",
+          "match": "#.*$"
+        }
+      ]
+    },
+    "strings": {
+      "patterns": [
+        {
+          "name": "string.quoted.double.dasm",
+          "begin": "\"",
+          "end": "\"",
+          "patterns": [
+            {
+              "name": "constant.character.escape.dasm",
+              "match": "\\\\."
+            }
+          ]
+        },
+        {
+          "name": "string.quoted.single.dasm",
+          "begin": "'",
+          "end": "'",
+          "patterns": [
+            {
+              "name": "constant.character.escape.dasm",
+              "match": "\\\\."
+            }
+          ]
+        }
+      ]
+    },
+    "section_directives": {
+      "patterns": [
+        {
+          "name": "keyword.control.section.dasm",
+          "match": "\\.(section|data|text|bss|rodata)\\b"
+        },
+        {
+          "name": "keyword.control.global.dasm",
+          "match": "\\.?(global|globl|extern)\\s+(\\w+)",
+          "captures": {
+            "1": { "name": "keyword.control.global.dasm" },
+            "2": { "name": "entity.name.function.dasm" }
+          }
+        },
+        {
+          "name": "keyword.control.mode.dasm",
+          "match": "\\b(MODE64|MODE32|MODE16|BITS\\s+(64|32|16))\\b"
+        }
+      ]
+    },
+    "test_directives": {
+      "patterns": [
+        {
+          "name": "keyword.control.test.dasm",
+          "match": "\\.test\\b",
+          "captures": {
+            "0": { "name": "keyword.control.test.dasm" }
+          }
+        },
+        {
+          "name": "storage.type.test-metadata.dasm",
+          "match": "\\.(description|author|category)\\s+(\"[^\"]*\"|\\S+)",
+          "captures": {
+            "1": { "name": "storage.type.test-metadata.dasm" },
+            "2": { "name": "string.quoted.double.dasm" }
+          }
+        },
+        {
+          "name": "storage.type.test-tag.dasm",
+          "match": "\\.tag\\s+(\"[^\"]*\"|\\S+)",
+          "captures": {
+            "1": { "name": "string.quoted.double.dasm" }
+          }
+        },
+        {
+          "name": "storage.type.test-config.dasm",
+          "match": "\\.(maxcalldepth|maxsteps|timeout|warmup|iterations|measure|skip|benchmark|entry_point)\\b"
+        }
+      ]
+    },
+    "macro_directives": {
+      "patterns": [
+        {
+          "name": "keyword.control.macro.dasm",
+          "begin": "\\.macro\\s+(\\w+)(.*)",
+          "end": "\\.endm\\b",
+          "beginCaptures": {
+            "1": { "name": "entity.name.function.macro.dasm" }
+          },
+          "endCaptures": {
+            "0": { "name": "keyword.control.macro.dasm" }
+          },
+          "patterns": [
+            { "include": "#comments" },
+            { "include": "#registers" },
+            { "include": "#vm_instructions" },
+            { "include": "#native_instructions" },
+            { "include": "#numbers" },
+            { "include": "#labels" }
+          ]
+        },
+        {
+          "name": "keyword.control.macro.dasm",
+          "match": "\\.endm\\b"
+        },
+        {
+          "name": "keyword.control.macro-call.dasm",
+          "match": "\\b([A-Z][A-Z_0-9]{2,})\\s*\\(",
+          "captures": {
+            "1": { "name": "entity.name.function.macro-call.dasm" }
+          }
+        }
+      ]
+    },
+    "data_directives": {
+      "patterns": [
+        {
+          "name": "storage.type.dasm",
+          "match": "\\.(byte|word|long|quad|dd|dw|db|string|asciz|ascii|resb|resw|resd|resq|comm|lcomm)\\b"
+        },
+        {
+          "name": "keyword.control.dasm",
+          "match": "\\.(org|align|p2align|balign|skip|space|fill|equ|set|include|incbin)\\b"
+        }
+      ]
+    },
+    "other_directives": {
+      "patterns": [
+        {
+          "name": "keyword.control.repeat.dasm",
+          "match": "\\.(irp|irpc|rept|endr)\\b"
+        },
+        {
+          "name": "keyword.control.assert.dasm",
+          "match": "\\.(assert_reg|assert_mem|assert_output|expect_error)\\b"
+        },
+        {
+          "name": "keyword.operator.debug.dasm",
+          "match": "DEBUG\\s+(ASSERT)\\b",
+          "captures": {
+            "1": { "name": "keyword.control.assert.dasm" }
+          }
+        },
+        {
+          "name": "keyword.control.conditional.dasm",
+          "match": "\\.(ifdef|ifndef|if|else|elseif|elif|endif|define|undef)\\b"
+        },
+        {
+          "name": "storage.modifier.dasm",
+          "match": "\\.(type|size|hidden|protected|internal)\\b"
+        },
+        {
+          "name": "variable.parameter.dasm",
+          "match": "\\\\[a-zA-Z_][a-zA-Z0-9_]*"
+        }
+      ]
+    },
+    "registers": {
+      "patterns": [
+        {
+          "name": "variable.language.register.gp64.dasm",
+          "match": "\\bR[AB]X\\b|\\bR[C]X\\b|\\bR[D]X\\b|\\bR[SD]I\\b|\\bR[BS]P\\b|\\bR(8|9|1[0-5])\\b"
+        },
+        {
+          "name": "variable.language.register.gp32.dasm",
+          "match": "\\bE[ABCD]X\\b|\\bE[SD]I\\b|\\bE[BS]P\\b"
+        },
+        {
+          "name": "variable.language.register.gp16.dasm",
+          "match": "\\b[ABCD]X\\b|\\b[SD]I\\b|\\b[BS]P\\b"
+        },
+        {
+          "name": "variable.language.register.gp8.dasm",
+          "match": "\\b[ABCD][LH]\\b|\\b[SD]IL\\b|\\b[BS]PL\\b|\\bR[89]B\\b|\\bR1[0-5]B\\b"
+        },
+        {
+          "name": "variable.language.register.vm.dasm",
+          "match": "\\bR[0-7]\\b"
+        },
+        {
+          "name": "variable.language.register.fp.dasm",
+          "match": "\\bST\\([0-7]\\)\\b|\\bST[0-7]\\b"
+        },
+        {
+          "name": "variable.language.register.segment.dasm",
+          "match": "\\b(CS|DS|ES|FS|GS|SS)\\b"
+        }
+      ]
+    },
+    "fpu_instructions": {
+      "patterns": [
+        {
+          "name": "keyword.operator.fpu.dasm",
+          "match": "\\b(FINIT|FCLEX|FSTSW|FSTCW|FLDCW|FILD|FISTP?|FLD|FSTP?|FADD|FSUB|FMUL|FDIV|FSIN|FCOS|FTAN|FSQRT|FABS|FCHS|FCOMPP?|FUCOMPP?|FXCH|F2XM1|FYL2X|FPTAN|FPATAN|FXTRACT|FPREM1?|FNDECSTP|FINCSTP|FRNDINT|FSCALE|FSINCOS|FCMOV|FFREE|FDECSTP|FTST|FXAM|FNOP|FWAIT|FRSTOR|FSAVE|FNSAVE|FSTENV|FLDENV|FXRSTOR|FXSAVE|FXSAVE64)\\b"
+        }
+      ]
+    },
+    "simd_instructions": {
+      "patterns": [
+        {
+          "name": "keyword.operator.simd.dasm",
+          "match": "\\b(VADD|VSUB|VMUL|VDIV|VDOT|VMIN|VMAX|VBROADCAST|VREDUCE|VEXP|VLOG|VABS|VSHL|VSHR|VAND|VOR|VXOR|VNOT|VCMP|VSEL|VLOAD|VSTORE|VZERO|PACKB|UNPACKB|PACKW|UNPACKW|PACKD|UNPACKD|SHUFB|SHUFW|SHUFD|VMOV|VINSERT|VEXTRACT|VPERM)\\b"
+        }
+      ]
+    },
+    "vm_instructions": {
+      "patterns": [
+        {
+          "name": "keyword.operator.vm.dasm",
+          "match": "\\b(LOAD_IMM|LOADL?|LOADR|STORER?|MOV|MOVZX|MOVSX|LEA|CMOV)\\b"
+        },
+        {
+          "name": "keyword.operator.vm.arithmetic.dasm",
+          "match": "\\b(ADD|ADC|SUB|SBB|MUL|IMUL|DIV|IDIV|INC|DEC|NEG)\\b"
+        },
+        {
+          "name": "keyword.operator.vm.compare.dasm",
+          "match": "\\bCMP\\b"
+        },
+        {
+          "name": "keyword.operator.vm.logic.dasm",
+          "match": "\\b(AND|OR|XOR|NOT|SHL|SHR|SAR|ROL|ROR|RCL|RCR|TEST|BT|BTC|BTR|BTS)\\b"
+        },
+        {
+          "name": "keyword.control.vm.jump.dasm",
+          "match": "\\b(JMP|CALL|RET|IRET|SYSCALL|INT)\\b"
+        },
+        {
+          "name": "keyword.control.vm.jumpcond.dasm",
+          "match": "\\b(J[ABGLENZCSOP]E?|J[ABGL]E|JN?[ABGLECZSPO])\\b"
+        },
+        {
+          "name": "keyword.control.vm.stack.dasm",
+          "match": "\\b(PUSH|POP|PUSHA|POPA|PUSHF|POPF)\\b"
+        },
+        {
+          "name": "keyword.operator.vm.io.dasm",
+          "match": "\\b(OUTSTR?|OUTL|IN|INL)\\b"
+        },
+        {
+          "name": "keyword.control.vm.misc.dasm",
+          "match": "\\b(HALT|NOP|WAIT|PAUSE|CLI|STI)\\b"
+        }
+      ]
+    },
+    "native_instructions": {
+      "patterns": [
+        {
+          "name": "keyword.operator.native.dasm",
+          "match": "(?i)\\b(movzx|movsx|cmov|lea)\\b"
+        },
+        {
+          "name": "keyword.operator.native.arithmetic.dasm",
+          "match": "(?i)\\b(add|adc|sub|sbb|mul|imul|div|idiv|inc|dec|neg)\\b"
+        },
+        {
+          "name": "keyword.operator.native.compare.dasm",
+          "match": "(?i)\\bcmp\\b"
+        },
+        {
+          "name": "keyword.operator.native.logic.dasm",
+          "match": "(?i)\\b(and|or|xor|not|shl|shr|sar|rol|ror|rcl|rcr|test|bt|btc|btr|bts)\\b"
+        },
+        {
+          "name": "keyword.control.native.jump.dasm",
+          "match": "(?i)\\b(jmp|call|ret|iret|syscall|sysenter|sysexit|int)\\b"
+        },
+        {
+          "name": "keyword.control.native.jumpcond.dasm",
+          "match": "(?i)\\b(j[abglenzcspo]e?|j[abgl]e|jn?[abgleczspo])\\b"
+        },
+        {
+          "name": "keyword.control.native.stack.dasm",
+          "match": "(?i)\\b(push|pop|pusha?|popa?|pushf|popf)\\b"
+        },
+        {
+          "name": "keyword.operator.native.io.dasm",
+          "match": "(?i)\\b(out|ins?|outsb|insb)\\b"
+        },
+        {
+          "name": "keyword.operator.native.move.dasm",
+          "match": "(?i)\\b(mov|cmpxchg|xchg|xadd)\\b"
+        },
+        {
+          "name": "keyword.control.native.misc.dasm",
+          "match": "(?i)\\b(halt|nop|wait|pause|cli|sti)\\b"
+        },
+        {
+          "name": "keyword.operator.native.string.dasm",
+          "match": "(?i)\\b(movs|stos|lods|scas|cmps|ins|outs)(b|w|d|q)?\\b"
+        },
+        {
+          "name": "keyword.operator.native.prefix.dasm",
+          "match": "(?i)\\b(rep|repe|repz|repne|repnz|cld|std|lock)\\b"
+        },
+        {
+          "name": "keyword.operator.native.convert.dasm",
+          "match": "(?i)\\b(cbw|cwd|cwde|cdq|cdqe|cqo|bswap|bswap)\\b",
+          "captures": {
+            "0": { "name": "keyword.operator.native.convert.dasm" }
+          }
+        },
+        {
+          "name": "keyword.operator.native.flag.dasm",
+          "match": "(?i)\\b(clc|stc|cmc|clts|lahf|sahf)\\b"
+        },
+        {
+          "name": "keyword.operator.native.cmov.dasm",
+          "match": "(?i)\\b(cmov[a-z]+)\\b"
+        },
+        {
+          "name": "keyword.operator.native.setcc.dasm",
+          "match": "(?i)\\b(set[a-z]+)\\b"
+        }
+      ]
+    },
+    "numbers": {
+      "patterns": [
+        {
+          "name": "constant.numeric.hex.dasm",
+          "match": "\\b0[xX][0-9a-fA-F]+\\b"
+        },
+        {
+          "name": "constant.numeric.binary.dasm",
+          "match": "\\b0[bB][01]+\\b"
+        },
+        {
+          "name": "constant.numeric.decimal.dasm",
+          "match": "\\b[0-9]+\\b"
+        }
+      ]
+    },
+    "labels": {
+      "patterns": [
+        {
+          "name": "entity.name.function.label.dasm",
+          "match": "^\\s*(\\w+)\\s*:",
+          "captures": {
+            "1": { "name": "entity.name.function.label.dasm" }
+          }
+        }
+      ]
+    },
+    "operators": {
+      "patterns": [
+        {
+          "name": "keyword.operator.arithmetic.dasm",
+          "match": "[+\\-*/%]"
+        },
+        {
+          "name": "punctuation.separator.comma.dasm",
+          "match": ","
+        },
+        {
+          "name": "punctuation.definition.bracket.dasm",
+          "match": "[{}]"
+        }
+      ]
+    }
+  }
+}
