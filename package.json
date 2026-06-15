@@ -1,5 +1,5 @@
 {
-  "name": "demi-syntax",
+  "name": "demi-dasm-syntax",
   "displayName": "DemiSyntax",
   "description": "Syntax highlighting for Demi DASM assembly and the Demi higher-level language",
   "version": "0.1.0",
