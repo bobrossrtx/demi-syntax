@@ -23,7 +23,7 @@
       {
         "id": "dasm",
         "aliases": ["DASM", "dasm", "Demi Assembly"],
-        "extensions": [".asm"],
+        "extensions": [".asm", ".dasm"],
         "configuration": "./language-configuration.json"
       }
     ],
